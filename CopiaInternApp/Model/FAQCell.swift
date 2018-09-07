@@ -9,7 +9,11 @@
 import UIKit
 
 class FAQCell: UITableViewCell {
-    
+    var contentItem: CellContent? {
+        didSet {
+            self.updateUI()
+        }
+    }
     // Creating the cell
     let cellView: UIView = {
         let cView = UIView()
@@ -21,7 +25,7 @@ class FAQCell: UITableViewCell {
     // Creating the label for the question
     let questionLabel: UILabel = {
         let qt = UILabel()
-        qt.text = "Yo Testing"
+        //qt.text = "Yo Testing"
         qt.textColor = .black
         qt.font = UIFont.systemFont(ofSize: 16)
         return qt
@@ -30,21 +34,13 @@ class FAQCell: UITableViewCell {
     // Creating the answer label
     let answerLabel: UILabel = {
         let label = UILabel()
-        label.text = "Under Testing!"
+        //label.text = "Under Testing!"
         label.textColor = .black
         label.font = UIFont.systemFont(ofSize: 16)
         return label
     }()
     
     // Creating Image Views for an up arrow and down arrow
-    let upArrowImageView: UIImageView = {
-        let iv = UIImageView()
-        iv.image = #imageLiteral(resourceName: "arrowUpiOS")
-        iv.contentMode = .scaleAspectFit
-        iv.layer.masksToBounds = true
-        return iv
-    }()
-    
     let downArrowImageView: UIImageView = {
         let iv = UIImageView()
         iv.image = #imageLiteral(resourceName: "arrowDowniOS")
@@ -55,24 +51,30 @@ class FAQCell: UITableViewCell {
     
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-
+        
         setDownArrow()
         setupCellView()
         setupQuestionLabel()
         setupAnswerLabel()
+        
+        self.questionLabel.bottomAnchor.constraint(equalTo: self.answerLabel.topAnchor, constant: -20).isActive = true
+        self.backgroundColor = UIColor(displayP3Red: 242.0/255.0, green: 242.0/255.0, blue: 242.0/255.0, alpha: 1.0)
+        self.selectionStyle = .none
     }
     
-    func setLabels(content: CellContent){
+    func updateUI() {
+        guard let content = self.contentItem else { return }
         self.questionLabel.text = content.question
         self.answerLabel.text = content.expanded ? content.answer : ""
+        setDownArrow()
+        self.downArrowImageView.transform = content.expanded ? CGAffineTransform(rotationAngle: .pi) : .identity // spins the arrow 180 degrees when tapped
     }
     
     //All functions below adds all views to TroubleShootViewController and setups constraints to position it perfectly
     func setupCellView(){
         addSubview(cellView)
-        cellView.setAnchor(top: topAnchor, left: leftAnchor, bottom: bottomAnchor, right: rightAnchor, paddingTop: 20, paddingLeft: 20, paddingBottom: 20, paddingRight: 20)
+        cellView.setAnchor(top: topAnchor, left: leftAnchor, bottom: bottomAnchor, right: rightAnchor, paddingTop: 20, paddingLeft: 20, paddingBottom: 20, paddingRight: 20, width: 0, height: 0)
     }
-    //
     func setDownArrow(){
         addSubview(downArrowImageView)
         downArrowImageView.setAnchor(top: topAnchor, left: nil, bottom: nil, right: rightAnchor, paddingTop: 40, paddingLeft: 0, paddingBottom: 0, paddingRight: 40, width: 0, height: 0)
@@ -80,15 +82,15 @@ class FAQCell: UITableViewCell {
     }
     
     func setupQuestionLabel(){
-        
+        questionLabel.numberOfLines = 0 // That way text can be wrapped around
         addSubview(questionLabel)
-        questionLabel.setAnchor(top: topAnchor, left: leftAnchor, bottom: nil, right: rightAnchor, paddingTop: 66.8, paddingLeft: 40, paddingBottom: 0, paddingRight: 40)
-        //questionTitle.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
+        questionLabel.setAnchor(top: cellView.topAnchor, left: leftAnchor, bottom: nil, right: rightAnchor, paddingTop: 80, paddingLeft: 40, paddingBottom: 0, paddingRight: 40, width: 0, height: 0)
     }
     
     func setupAnswerLabel(){
+        answerLabel.numberOfLines = 0
         addSubview(answerLabel)
-        answerLabel.setAnchor(top: nil, left: leftAnchor, bottom: bottomAnchor, right: rightAnchor, paddingTop: 20, paddingLeft: 40, paddingBottom: 80, paddingRight: 65)
+        answerLabel.setAnchor(top: nil, left: leftAnchor, bottom: bottomAnchor, right: rightAnchor, paddingTop: 20, paddingLeft: 40, paddingBottom: 80, paddingRight: 65, width: 0, height: 0)
     }
     
     required init?(coder aDecoder: NSCoder) {
